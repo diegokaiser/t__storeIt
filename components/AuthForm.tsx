@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
-import { createAccount } from '@/lib/actions/user-actions';
+import { createAccount, signInUser } from '@/lib/actions/user-actions';
 import { Button } from '@/components/ui/button';
 import OTPmodal from '@/components/OTPmodal';
 import {
@@ -27,7 +27,7 @@ const authFormSchema = (formType: FormType) => {
   return z.object({
     email: z.string().email(),
     fullName:
-      formType === 'sign-in' ? z.string().min(2).max(50) : z.string().optional()
+      formType === 'sign-up' ? z.string().min(2).max(50) : z.string().optional()
   });
 };
 
@@ -51,10 +51,13 @@ const AuthForm = ({ type }: { type: FormType }) => {
     setIsLoading(true);
     setErrorMessage('');
     try {
-      const user = await createAccount({
-        fullName: values.fullName || '',
-        email: values.email
-      });
+      const user =
+        type === 'sign-up'
+          ? await createAccount({
+              fullName: values.fullName || '',
+              email: values.email
+            })
+          : await signInUser({ email: values.email });
       setAccountId(user.accountId);
     } catch (error) {
       setErrorMessage('Failed to create account. Please try again');
@@ -68,9 +71,9 @@ const AuthForm = ({ type }: { type: FormType }) => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="auth-form">
           <h1 className="form-title">
-            {type === 'sign-in' ? 'Sign in' : 'Sign Up'}
+            {type === 'sign-in' ? 'Sign In' : 'Sign Up'}
           </h1>
-          {type === 'sign-in' && (
+          {type !== 'sign-in' && (
             <FormField
               control={form.control}
               name="fullName"
@@ -124,7 +127,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
                 className="ml-2 animate-spin"
               />
             ) : (
-              <>{type === 'sign-in' ? 'Sign In' : 'Sign Up'}</>
+              <>{type === 'sign-in' ? 'Login' : 'Sign Up'}</>
             )}
           </Button>
           {errorMessage && <p className="error-message">*{errorMessage}</p>}
@@ -139,7 +142,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
               href={type === 'sign-in' ? '/sign-up' : 'sign-in'}
               className="ml-1 font-medium text-brand"
             >
-              {type === 'sign-in' ? 'Create Account' : 'Login'}
+              {type !== 'sign-in' ? 'Login' : 'Create Account'}
             </Link>
           </div>
         </form>
