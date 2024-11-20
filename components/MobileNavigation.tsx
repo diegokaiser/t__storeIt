@@ -15,6 +15,7 @@ import {
   SheetTrigger
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import { signOutUser } from '@/lib/actions/user-actions';
 
 interface Props {
   ownerId: string;
@@ -99,7 +100,13 @@ const MobileNavigation = ({
           <Separator className="my-5 bg-lime-200/20" />
           <div className="flex flex-col justify-between gap-5 pb-5">
             <FileUploader />
-            <Button type="submit" className="mobile-sign-out-button">
+            <Button
+              type="submit"
+              className="mobile-sign-out-button"
+              onClick={async () => {
+                signOutUser();
+              }}
+            >
               <Image
                 src="/assets/icons/logout.svg"
                 alt="logo"
