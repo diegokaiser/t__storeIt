@@ -4,6 +4,7 @@ import { Query, ID } from "node-appwrite"
 import { createAdminClient } from "@/lib/appwrite"
 import { appwriteConfig } from "@/lib/appwrite/config"
 import { parseStringify } from "@/lib/utils"
+import { cookies } from "next/headers"
 
 // user enters full name and email
 // check if the user already exists using the email
@@ -30,7 +31,7 @@ const handleError = (error: unknown, message: string) => {
   throw error
 }
 
-const sendEmailOTP = async ({ email }: { email: string }) => {
+export const sendEmailOTP = async ({ email }: { email: string }) => {
   const { account } = await createAdminClient()
 
   try {
@@ -43,6 +44,7 @@ const sendEmailOTP = async ({ email }: { email: string }) => {
 }
 
 export const createAccount = async ({ fullName, email }: { fullName: string, email: string}) => {
+  console.log('1')
   const existingUser = await getUserByEmail(email)
 
   const accountId = await sendEmailOTP({ email })
@@ -65,3 +67,28 @@ export const createAccount = async ({ fullName, email }: { fullName: string, ema
   }
   return parseStringify({ accountId })
 }
+
+export const verifySecret = async ({
+  accountId,
+  password,
+}: {
+  accountId: string;
+  password: string;
+}) => {
+  try {
+    const { account } = await createAdminClient();
+
+    const session = await account.createSession(accountId, password);
+
+    (await cookies()).set("appwrite-session", session.secret, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "strict",
+      secure: true,
+    });
+
+    return parseStringify({ sessionId: session.$id });
+  } catch (error) {
+    handleError(error, "Failed to verify OTP");
+  }
+};

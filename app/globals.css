@@ -57,6 +57,11 @@
   :root {
     --radius: 0.5rem;
   }
+  input:is(:-webkit-autofill, :autofill),
+  input:autofill,
+  input:-internal-autofill-selected {
+    background: transparent !important;
+  }
 }
 
 @layer utilities {

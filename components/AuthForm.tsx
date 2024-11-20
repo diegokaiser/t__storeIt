@@ -7,7 +7,9 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
+import { createAccount } from '@/lib/actions/user-actions';
 import { Button } from '@/components/ui/button';
+import OTPmodal from '@/components/OTPmodal';
 import {
   Form,
   FormControl,
@@ -18,7 +20,6 @@ import {
   FormMessage
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { createAccount } from '@/lib/actions/user-actions';
 
 type FormType = 'sign-in' | 'sign-up';
 
@@ -47,21 +48,14 @@ const AuthForm = ({ type }: { type: FormType }) => {
 
   // submit handler
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
     setIsLoading(true);
     setErrorMessage('');
     try {
-      {
-        /**
-        const user = await createAccount({
-          fullName: values.fullName || '',
-          email: values.email
-        });
-        setAccountId(user.accountId);
-      */
-      }
-      console.log('enviando valores a createAccount');
-      console.log('todo gucci');
+      const user = await createAccount({
+        fullName: values.fullName || '',
+        email: values.email
+      });
+      setAccountId(user.accountId);
     } catch (error) {
       setErrorMessage('Failed to create account. Please try again');
     } finally {
@@ -151,6 +145,9 @@ const AuthForm = ({ type }: { type: FormType }) => {
         </form>
       </Form>
       {/* OTP validation */}
+      {accountId && (
+        <OTPmodal email={form.getValues('email')} accountId={accountId} />
+      )}
     </>
   );
 };
