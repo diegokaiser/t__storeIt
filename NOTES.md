@@ -86,3 +86,13 @@ Lo que será igual a si aplicaramos
 Crear una carpeta `(auth)` para _group routing_ y dentro crear las rutas (mediante folders) `sign-in` y `sign-up` hay que tener en cuenta que (auth) no será tomado en cuenta en la navegación, solo agrupa rutas.
 
 Sin embargo podemos compartir UI creando un archivo `layout.tsx` en `(auth)` que afecten a las rutas bajo esa carpeta.
+
+## Auth Form
+
+Es necesario
+
+-Definir un esquema de datos
+
+-Definir el formulario, que usa el esquema de datos
+
+-Definir un manejador del evento submit
